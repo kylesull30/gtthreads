@@ -29,7 +29,7 @@ int gtthread_mutex_init(gtthread_mutex_t* mutex){
 int gtthread_mutex_lock(gtthread_mutex_t* mutex){
 
 }
-`
+
 /*
   The gtthread_mutex_unlock() is analogous to pthread_mutex_unlock.
   Returns zero on success.
