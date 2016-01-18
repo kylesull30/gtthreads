@@ -13,8 +13,8 @@ producer_consumer: producer_consumer.o steque.o
 	$(CC) -o producer_consumer producer_consumer.o steque.o -lpthread
 
 #### Dining ####
-dining_main: dining_main.o
-	$(CC) -o dining_main dining_main.o -lpthread
+dining_main: dining_main.o chopsticks.o philosopher.o
+	$(CC) -o dining_main $^ -lpthread
 
 #### GTThreads ####
 gtthread_main: gtthread_main.o $(GTTHREADS_OBJ)
