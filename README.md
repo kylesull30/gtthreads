@@ -27,9 +27,11 @@ The end goal of this project is to write a preemptive user-level threads library
 
 ## Setup<a id="sec-1-2" name="sec-1-2"></a>
 
-1.  Gain access to a well-maintained linux machine.  If you do not have this already, then it is recommended that you follow the README[instructions](/wiki/ud156\_virtualbox) for downloading and installing VirtualBox and the AOS Virtual Image.
+1.  Gain access to a well-maintained linux machine.  If you do not have this already, then it is recommended that you follow the [instructions](https://www.udacity.com/wiki/ud156-virtualbox) for downloading and installing VirtualBox and the AOS Virtual Image.
 
-2.  Download [gtthreads.tar.gz](<https://t-square.gatech.edu/access/content/group/gtc-6986-478d-546f-8ee0-ed0661a439c3/gtthreads.tar.gz>), which contains the starter code for the project.
+2.  Clone this repository, which contains the starter code for the project.
+    
+        git clone git@github.gatech.edu:sb300/oms-aos-gtthreads.git
 
 3.  You can confirm that you have pthreads installed on your linux platform with the command
     
@@ -45,14 +47,14 @@ For this and all projects, students must work on their own.
 
 ## Warm-up<a id="sec-1-4" name="sec-1-4"></a>
 
-To familiarize yourself with the pthreads library, you will debug a simple test program named producer\_consumer.c.  You may read about the [pthread api](<https://computing.llnl.gov/tutorials/pthreads/>) or consult the man pages on your virtual platform.  For example, to learn about pthread\_join, type
+To familiarize yourself with the pthreads library, you will debug a simple test program named producer_consumer.c.  You may read about the [pthread api](https://computing.llnl.gov/tutorials/pthreads/) or consult the man pages on your virtual platform.  For example, to learn about pthread_join, type
 
     man pthread_join
 
 in a terminal.
 
 There are five bugs in total (you may consult the videos for the project to help you find them.)
-After finding these bugs, provide answers to the questions given in the QA\_producter\_consumer.txt in that file.
+After finding these bugs, provide answers to the questions given in the QA_producter_consumer.txt in that file.
 
 ---
 
@@ -70,17 +72,18 @@ There is no requirement to implement fairness among the philosophers, as long as
 
 ## GTthreads<a id="sec-1-6" name="sec-1-6"></a>
 
-The main part of the project is to implement a user-level thread library with an api similar to POSIX threads or pthreads.  The specifications for implementing this api are found in the two files [gtthread\_sched.c](<https://t-square.gatech.edu/access/content/group/gtc-6986-478d-546f-8ee0-ed0661a439c3/gtthreads/gtthread_sched.c>) and [gtthread\_mutex.c](<https://t-square.gatech.edu/access/content/group/gtc-6986-478d-546f-8ee0-ed0661a439c3/gtthreads/gtthread_mutex.c>).
+The main part of the project is to implement a user-level thread library with an api similar to POSIX threads or pthreads.  The specifications for implementing this api are found in the two files 
+[gtthread_sched.c](https://github.gatech.edu/sb300/oms-aos-gtthreads/blob/master/gtthread_sched.c) and [gtthread_mutex.c](https://github.gatech.edu/sb300/oms-aos-gtthreads/blob/master/gtthread_mutex.c)
 
 The following strategies are highly recommended:
 
 -   Use the provided steque data structure (in files steque.[ch]) for both your scheduling queue and your mutex locks.
--   Use swapcontext, makecontext, and getcontext functions, which are illustrated in the example program [tennis.c](<https://t-square.gatech.edu/access/content/group/gtc-6986-478d-546f-8ee0-ed0661a439c3/gtthreads/tennis.c>), to switch among your threads.
--   Use setitimer, sigaction, sigprocmask, and related functions, which are illustrated in the example program [defcon.c](<https://t-square.gatech.edu/access/content/group/gtc-6986-478d-546f-8ee0-ed0661a439c3/gtthreads/defcon.c>), to achieve pre-emption among your threads.  Consult this [post](<http://www.linuxprogrammingblog.com/all-about-linux-signals?page=show>) and the [wikipedia article](<http://en.wikipedia.org/wiki/Unix_signal>) for more information.
+-   Use swapcontext, makecontext, and getcontext functions, which are illustrated in the example program [tennis.c](https://github.gatech.edu/sb300/oms-aos-gtthreads/blob/master/tennis.c), to switch among your threads.
+-   Use setitimer, sigaction, sigprocmask, and related functions, which are illustrated in the example program [defcon.c](https://github.gatech.edu/sb300/oms-aos-gtthreads/blob/master/defcon.c), to achieve pre-emption among your threads.  Consult this [post](http://www.linuxprogrammingblog.com/all-about-linux-signals?page=show) and the [wikipedia article](http://en.wikipedia.org/wiki/Unix_signal) for more information.
 
 It is also suggested that you work incrementally.  For instance, you might the task into the following pieces:
 
-1.  Implement and test the library without pre-emption or mutexes and use gtthread\_yield only to change threads.
+1.  Implement and test the library without pre-emption or mutexes and use gtthread_yield only to change threads.
 2.  Add preemption via the signal handler.
 3.  Add the mutex capabilities.
 
@@ -105,13 +108,13 @@ It is also suggested that you work incrementally.  For instance, you might the t
 
 <tbody>
 <tr>
-<td class="left">producer\_consumer.c</td>
+<td class="left">producer_consumer.c</td>
 <td class="right">5%</td>
 </tr>
 
 
 <tr>
-<td class="left">QA\_producer\_consumer.txt</td>
+<td class="left">QA_producer_consumer.txt</td>
 <td class="right">5%</td>
 </tr>
 
