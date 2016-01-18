@@ -10,19 +10,29 @@
 ** Goal
   The end goal of this project is to write a preemptive user-level threads library with mutex exclusion.  Along the way, you will become familiar with the pthreads library and solve the classic mutual exclusion puzzle of “The Dining Philosophers”.
 
-** Setup
-   1. Gain access to a well-maintained linux machine.  If you do not have this already, then it is recommended that you follow the [[https://www.udacity.com/wiki/ud156-virtualbox][instructions]] for downloading and installing VirtualBox and the AOS Virtual Image. 
+** Setup and Build
+*** Setup
+    1. Gain access to a well-maintained linux machine.  If you do not have this already, then it is recommended that you follow the [[https://www.udacity.com/wiki/ud156-virtualbox][instructions]] for downloading and installing VirtualBox and the AOS Virtual Image. 
       
-   2. Clone this repository, which contains the starter code for the project.
-      #+BEGIN_SRC sh
+    2. Clone this repository, which contains the starter code for the project.
+       #+BEGIN_SRC sh
         git clone git@github.gatech.edu:sb300/oms-aos-gtthreads.git
-      #+END_SRC
+       #+END_SRC
       
-   3. You can confirm that you have pthreads installed on your linux platform with the command
+    3. You can confirm that you have pthreads installed on your linux platform with the command
 
-      #+BEGIN_SRC sh
+       #+BEGIN_SRC sh
         ldconfig -p | grep libpthread
-      #+END_SRC
+       #+END_SRC
+
+*** Build
+    #+BEGIN_SRC sh
+      make producer_consumer # Build for producer_consumer
+      make dining_main # Build for dining philosophy
+      make gtthread_main # Build for gtthread library
+      make clean # Clean 
+    #+END_SRC
+    To build the gtthread library, you should define two data structures, /gtthread_t/ and /gtthread_mutex_t/, in [[https://github.gatech.edu/sb300/oms-aos-gtthreads/blob/master/gtthread.h][gtthread.h]]; otherwise, it wouldn't compile.
 
 -----
 

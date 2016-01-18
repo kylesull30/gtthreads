@@ -5,7 +5,12 @@
 <li><a href="#sec-1">1. GTThreads: A Preemptive User-level Threads Library</a>
 <ul>
 <li><a href="#sec-1-1">1.1. Goal</a></li>
-<li><a href="#sec-1-2">1.2. Setup</a></li>
+<li><a href="#sec-1-2">1.2. Setup and Build</a>
+<ul>
+<li><a href="#sec-1-2-1">1.2.1. Setup</a></li>
+<li><a href="#sec-1-2-2">1.2.2. Build</a></li>
+</ul>
+</li>
 <li><a href="#sec-1-3">1.3. Collaboration</a></li>
 <li><a href="#sec-1-4">1.4. Warm-up</a></li>
 <li><a href="#sec-1-5">1.5. Dining Philosophers</a></li>
@@ -25,7 +30,9 @@
 
 The end goal of this project is to write a preemptive user-level threads library with mutex exclusion.  Along the way, you will become familiar with the pthreads library and solve the classic mutual exclusion puzzle of “The Dining Philosophers”.
 
-## Setup<a id="sec-1-2" name="sec-1-2"></a>
+## Setup and Build<a id="sec-1-2" name="sec-1-2"></a>
+
+### Setup<a id="sec-1-2-1" name="sec-1-2-1"></a>
 
 1.  Gain access to a well-maintained linux machine.  If you do not have this already, then it is recommended that you follow the [instructions](https://www.udacity.com/wiki/ud156-virtualbox) for downloading and installing VirtualBox and the AOS Virtual Image.
 
@@ -36,6 +43,15 @@ The end goal of this project is to write a preemptive user-level threads library
 3.  You can confirm that you have pthreads installed on your linux platform with the command
     
         ldconfig -p | grep libpthread
+
+### Build<a id="sec-1-2-2" name="sec-1-2-2"></a>
+
+    make producer_consumer # Build for producer_consumer
+    make dining_main # Build for dining philosophy
+    make gtthread_main # Build for gtthread library
+    make clean # Clean
+
+To build the gtthread library, you should define two data structures, *gtthread_t* and *gtthread_mutex_t*, in [gtthread.h](https://github.gatech.edu/sb300/oms-aos-gtthreads/blob/master/gtthread.h); otherwise, it wouldn't compile.
 
 ---
 
