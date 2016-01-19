@@ -38,7 +38,7 @@ The end goal of this project is to write a preemptive user-level threads library
 
 2.  Clone this repository, which contains the starter code for the project.
     
-        git clone git@github.gatech.edu:sb300/oms-aos-gtthreads.git
+        git clone https://github.gatech.edu/sb300/oms-aos-gtthreads.git
 
 3.  You can confirm that you have pthreads installed on your linux platform with the command
     
