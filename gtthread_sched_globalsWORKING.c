@@ -91,7 +91,7 @@ int gtthread_create(gtthread_t *thread, void *(*start_routine)(void *),
 
 
 	// Set successor
-	next_thread.context.uc_link = &main_thread.context;
+	next_thread.context.uc_link = &current_thread.context;
 	
 	//set starting routine
 	makecontext(&next_thread.context, (void *)start_routine, 1, NULL);
@@ -101,7 +101,7 @@ int gtthread_create(gtthread_t *thread, void *(*start_routine)(void *),
   printf("Swapping Context...\n");
   fflush(stdout);
   
-	if (swapcontext(&main_thread.context, &next_thread.context) == -1){
+	if (swapcontext(&current_thread.context, &next_thread.context) == -1){
     perror("swapcontext");
     exit(EXIT_FAILURE);
 		return -1;

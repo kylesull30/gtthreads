@@ -13,8 +13,6 @@ void *consumer_routine(void *arg);
 
 /* Global Data */
 long g_num_prod = 0; /* number of producer threads */
-
-//Bug 1: Initialize the mutex statically.
 pthread_mutex_t g_num_prod_lock = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t g_queue_lock = PTHREAD_MUTEX_INITIALIZER;
 
@@ -43,11 +41,9 @@ int main(int argc, char **argv) {
 
   printf("Producer thread started with thread id %" PRIdPTR "\n", (intptr_t) producer_thread);
 
-  //Bug 2: Detach the thread after creating it and then attempting to join it. I determined to 
-  // eliminate the detach call instead of the join call.
- // result = pthread_detach(producer_thread);
- // if (0 != result)
-  //  fprintf(stderr, "Failed to detach producer thread: %s\n", strerror(result));
+  result = pthread_detach(producer_thread);
+  if (0 != result)
+    fprintf(stderr, "Failed to detach producer thread: %s\n", strerror(result));
 
   result = pthread_create(&consumer_thread, NULL, consumer_routine, &queue);
   if (0 != result) {
@@ -70,9 +66,7 @@ int main(int argc, char **argv) {
   }
   
   printf("\nPrinted %"PRIdPTR" characters.\n", (intptr_t) thread_return);
-  // Bug 3: thread_return wasn't allocated and therefore doesn't need to be freed. It can simply be
-  // cast as a integer pointer.
-  //free(thread_return);
+  free(thread_return);
 
   pthread_mutex_destroy(&g_queue_lock);
   pthread_mutex_destroy(&g_num_prod_lock);
@@ -104,7 +98,7 @@ void *producer_routine(void *arg) {
       /* Add the node to the queue */
       pthread_mutex_lock(&g_queue_lock);
 
-      steque_enqueue(queue_p, c);
+      steque_enqueue(queue_p, (void*) c);
 
       pthread_mutex_unlock(&g_queue_lock);
 
@@ -112,8 +106,6 @@ void *producer_routine(void *arg) {
     }
   }
 
-  // Bug 4: Lock and then unlock the g_num_prod global variable before and after modifying it to
-  // prevent race condition.
   pthread_mutex_lock(&g_num_prod_lock);
   --g_num_prod;
   pthread_mutex_unlock(&g_num_prod_lock);
@@ -148,16 +140,9 @@ void *consumer_routine(void *arg) {
       pthread_mutex_unlock(&g_queue_lock);
       sched_yield();
     }
-  // Bug 5: the queue lock and g_num global variable are both unlocked at the beginning of this loop,
-  // which is fine for the first iteration of the loop, but on subsequent iterations the varibales
-  // are unlocked before they are locked again. Therefore, at the end of the loop you must add locks
-  // for both in roder to have subsequent unlocks be called from the correct state.
-  pthread_mutex_lock(&g_queue_lock);
-  pthread_mutex_lock(&g_num_prod_lock);
   }
   pthread_mutex_unlock(&g_num_prod_lock);
   pthread_mutex_unlock(&g_queue_lock);
 
   return (void*) count;
 }
-

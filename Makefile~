@@ -21,7 +21,7 @@ gtthread_main: gtthread_main.o $(GTTHREADS_OBJ)
 	$(CC) -o gtthread_main gtthread_main.o $(GTTHREADS_OBJ)
 
 #### Tennis ####
-tennis: tennis.o tennis.c
+gtthread_main: tennis.o tennis.c
 	$(CC) -o tennis tennis.o
 
 clean:

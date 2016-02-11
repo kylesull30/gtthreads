@@ -6,7 +6,7 @@
 
 /* Define gtthread_t and gtthread_mutex_t types here */
 typedef struct gtthread_t{
-  ucontext_t context;
+  ucontext_t *context;
 	int id;
 } gtthread_t;
 typedef void* gtthread_mutex_t;

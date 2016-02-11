@@ -21,7 +21,7 @@ gtthreads library.  A simple round-robin queue should be used.
 static int id = 0;
 static int p;
 static steque_t queue;
-static gtthread_t *running_thread;
+//static gtthread_t *running_thread;
 static gtthread_t main_thread;
 //static ucontext_t uctx_thisRoutine;
 
@@ -48,13 +48,13 @@ void gtthread_init(long period){
 
 	p = period;
 
-	gtthread_t first_thread;
-	first_thread.id = 0;
-	//first_thread.context.uc_link = NULL;
-	steque_init(&queue);
 
-	running_thread = &first_thread;	
-	main_thread= first_thread;
+	main_thread.id = 0;
+	//steque_enqueue(&queue,
+
+
+
+
   
 	
 }
@@ -69,7 +69,7 @@ int gtthread_create(gtthread_t *thread, void *(*start_routine)(void *),
   printf("Entering create...\n");
   fflush(stdout);
 
-	gtthread_t current_thread = *running_thread;
+	//gtthread_t current_thread = *running_thread;
 
 	gtthread_t next_thread;
 
@@ -108,8 +108,7 @@ int gtthread_create(gtthread_t *thread, void *(*start_routine)(void *),
 
   }
 	
- 	steque_enqueue(&queue, &current_thread);
-	running_thread = &next_thread;
+
 
 	return 0;
 }
@@ -122,14 +121,14 @@ int gtthread_join(gtthread_t thread, void **status){
 // waits for thread to terminate
 //while thread is running loop
  
-	return ;
+	return 0;
 }
 
 /*
   The gtthread_exit() function is analogous to pthread_exit.
  */
 void gtthread_exit(void* retval){
-  exit(EXIT_SUCCESS);
+  //exit(EXIT_SUCCESS);
 }
 
 
@@ -143,28 +142,17 @@ void gtthread_yield(void){
 	// set context to main, then implement as set to next in queue
 	gtthread_t current_thread;
 
-	 if(steque_size(&queue)>0){
-		gtthread_t next_thread = *(gtthread_t*)steque_pop(&queue);
+	 
  		current_thread = *running_thread;
 	
  		printf("Swapping back to main...\n");
   	fflush(stdout);
 
-		if (swapcontext(&current_thread.context, &next_thread.context) == -1){
-   	 perror("swapcontext");
-    	exit(EXIT_FAILURE);
-  	}
-	}
-	else{
-		printf("Setting back to main...\n");
-  	fflush(stdout);
- 		current_thread = *running_thread;
 		if (swapcontext(&current_thread.context, &main_thread.context) == -1){
    	 perror("swapcontext");
     	exit(EXIT_FAILURE);
   	}
-
-	}
+	
 
 }
 

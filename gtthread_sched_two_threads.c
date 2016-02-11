@@ -22,7 +22,7 @@ static int id = 0;
 static int p;
 static steque_t queue;
 static gtthread_t *running_thread;
-static gtthread_t main_thread;
+static gtthread_t *main_thread;
 //static ucontext_t uctx_thisRoutine;
 
 
@@ -50,11 +50,11 @@ void gtthread_init(long period){
 
 	gtthread_t first_thread;
 	first_thread.id = 0;
-	//first_thread.context.uc_link = NULL;
+
 	steque_init(&queue);
 
 	running_thread = &first_thread;	
-	main_thread= first_thread;
+	main_thread= running_thread;
   
 	
 }
@@ -91,7 +91,7 @@ int gtthread_create(gtthread_t *thread, void *(*start_routine)(void *),
 
 
 	// Set successor
-	next_thread.context.uc_link = &main_thread.context;
+	next_thread.context.uc_link = &current_thread.context;
 	
 	//set starting routine
 	makecontext(&next_thread.context, (void *)start_routine, 1, NULL);
@@ -101,11 +101,10 @@ int gtthread_create(gtthread_t *thread, void *(*start_routine)(void *),
   printf("Swapping Context...\n");
   fflush(stdout);
   
-	if (swapcontext(&main_thread.context, &next_thread.context) == -1){
+	if (swapcontext(&current_thread.context, &next_thread.context) == -1){
     perror("swapcontext");
-    exit(EXIT_FAILURE);
 		return -1;
-
+    exit(EXIT_FAILURE);
   }
 	
  	steque_enqueue(&queue, &current_thread);
@@ -122,14 +121,14 @@ int gtthread_join(gtthread_t thread, void **status){
 // waits for thread to terminate
 //while thread is running loop
  
-	return ;
+	return 1;
 }
 
 /*
   The gtthread_exit() function is analogous to pthread_exit.
  */
 void gtthread_exit(void* retval){
-  exit(EXIT_SUCCESS);
+
 }
 
 
@@ -141,30 +140,20 @@ void gtthread_exit(void* retval){
 void gtthread_yield(void){
 	// remove next thread from stack and set current thread to end of queue
 	// set context to main, then implement as set to next in queue
-	gtthread_t current_thread;
 
-	 if(steque_size(&queue)>0){
-		gtthread_t next_thread = *(gtthread_t*)steque_pop(&queue);
- 		current_thread = *running_thread;
-	
- 		printf("Swapping back to main...\n");
-  	fflush(stdout);
-
-		if (swapcontext(&current_thread.context, &next_thread.context) == -1){
-   	 perror("swapcontext");
-    	exit(EXIT_FAILURE);
-  	}
-	}
-	else{
-		printf("Setting back to main...\n");
-  	fflush(stdout);
- 		current_thread = *running_thread;
-		if (swapcontext(&current_thread.context, &main_thread.context) == -1){
-   	 perror("swapcontext");
-    	exit(EXIT_FAILURE);
-  	}
-
-	}
+ 	//setcontext(&main_thread.context);	
+	//printf("Running thread is %d. There are %d elements in the queue.\n", running_thread.id, steque_size(&queue));
+	 
+	//gtthread_t running_thread = *(gtthread_t*)steque_pop(&queue);
+	gtthread_t next_thread = *(gtthread_t*)steque_pop(&queue);
+	gtthread_t current_thread = *running_thread;
+	printf("Swapping back to main...\n");
+  fflush(stdout);
+	//setcontext(&next_thread.context);	
+	if (swapcontext(&current_thread.context, &next_thread.context) == -1){
+    perror("swapcontext");
+    exit(EXIT_FAILURE);
+  }
 
 }
 
@@ -173,13 +162,8 @@ void gtthread_yield(void){
   returning non-zero if the threads are the same and zero otherwise.
  */
 int  gtthread_equal(gtthread_t t1, gtthread_t t2){
-	if(t1.id == t2.id){
-		return 1;
-	}
- else{
-			return 0;
-	}
 
+	return 0;
 }
 
 /*
@@ -194,5 +178,5 @@ int  gtthread_cancel(gtthread_t thread){
   Returns calling thread.
  */
 gtthread_t gtthread_self(void){
-	return main_thread;
+	//return main_thread;
 }
