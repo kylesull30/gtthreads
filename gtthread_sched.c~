@@ -52,7 +52,6 @@ void gtthread_init(long period){
 	steque_init(&queue);
 	main_thread_pointer->context.uc_link = NULL;
 	running_thread = main_thread_pointer;	
-	//main_thread_pointer= &main_thread;
  	steque_enqueue(&queue, main_thread_pointer);
 }
 
@@ -86,7 +85,7 @@ int gtthread_create(gtthread_t *thread, void *(*start_routine)(void *),
 	printf("Thread %d running after setting context link.\n", running_thread->id);
   	fflush(stdout);
 	//set starting routine
-	makecontext(&next_thread->context, (void *)start_routine, 1, NULL);
+	makecontext(&next_thread->context, (void *)start_routine, 1, args);
 	printf("Thread %d running after makecontext.\n", running_thread->id);
   	fflush(stdout);
  	next_thread->id = ++id;
@@ -147,9 +146,10 @@ void gtthread_yield(void){
 		printf("Enqueueing current thread to queue\n");
   		fflush(stdout);
 		steque_enqueue(&queue, running_thread);
-
+		running_thread->state = WAITING;
+		next_thread->state = RUNNING;
 		if (swapcontext(&running_thread->context, &next_thread->context) == -1){
-			printf("EError in context switch.\n");
+			printf("Error in context switch.\n");
   			fflush(stdout);
    	 		perror("swapcontext");
     			exit(EXIT_FAILURE);
@@ -159,7 +159,7 @@ void gtthread_yield(void){
   		fflush(stdout);
 
 	}
-	else{
+	/*else{
   	printf("Nothing in queue....\n");
   	fflush(stdout);
 		if (setcontext(&main_thread_pointer->context) == -1){
@@ -167,7 +167,7 @@ void gtthread_yield(void){
             		exit(EXIT_FAILURE);
         	}
 
-	}
+	}*/
 
 }
 
@@ -179,7 +179,7 @@ int  gtthread_equal(gtthread_t t1, gtthread_t t2){
 	if(t1.id == t2.id){
 		return 1;
 	}
- else{
+ 	else{
 			return 0;
 	}
 
@@ -190,6 +190,8 @@ int  gtthread_equal(gtthread_t t1, gtthread_t t2){
   allowing one thread to terminate another asynchronously.
  */
 int  gtthread_cancel(gtthread_t thread){
+	thread.state = FINISHED;
+	// do cancel stuff
 	return 0;
 }
 
@@ -197,5 +199,5 @@ int  gtthread_cancel(gtthread_t thread){
   Returns calling thread.
  */
 gtthread_t gtthread_self(void){
-	return *(running_thread);
+	return *(main_thread_pointer);
 }

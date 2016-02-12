@@ -5,11 +5,19 @@
 #include <ucontext.h>
 
 /* Define gtthread_t and gtthread_mutex_t types here */
+
 typedef struct gtthread_t{
-  ucontext_t *context;
-	int id;
+  ucontext_t context;
+enum States{
+  	RUNNING,
+  	WAITING,
+  	FINISHED
+	} state;
+  int id;
+  
 } gtthread_t;
 typedef void* gtthread_mutex_t;
+
 
 
 void gtthread_init(long period);
