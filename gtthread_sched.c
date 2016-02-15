@@ -348,6 +348,8 @@ void gtthread_yield(void){
   returning non-zero if the threads are the same and zero otherwise.
  */
 int  gtthread_equal(gtthread_t t1, gtthread_t t2){
+		printf("Checking to see if %d is equal to %d \n", t1.id, t2.id);
+  	fflush(stdout);
 	if(t1.id == t2.id){
 		return 1;
 	}
@@ -373,5 +375,7 @@ exit(0);
   Returns calling thread.
  */
 gtthread_t gtthread_self(void){
-	return *(main_thread_pointer);
+		printf("Main thread is ID %d\n", running_thread->id);
+  	fflush(stdout);
+	return *(running_thread);
 }
