@@ -57,8 +57,17 @@ void thread_runner(void) {
   		fflush(stdout);
     	gtthread_exit(NULL);
 	}
-   running_thread = main_thread_pointer;
 
+
+	/*if(check_thread(0) == 0){
+				running_thread = main_thread_pointer;
+	}
+	else{
+
+			running_thread = thread_pointers[1];
+	}*/
+
+	running_thread = main_thread_pointer;
  printf("Leaving runner with thread %d running\n", running_thread->id);
   fflush(stdout);
 
@@ -115,6 +124,8 @@ void gtthread_init(long period){
 	thread_pointers [0] = main_thread_pointer;
 
 	running_thread = main_thread_pointer;
+
+
  	printf("Eqnueueing %d (%p) running.\n", running_thread->id, running_thread);
   fflush(stdout);	
  	steque_enqueue(&queue, main_thread_pointer);
@@ -239,15 +250,47 @@ void gtthread_exit(void* retval){
 		// remove from queue
 		
 		// Do i need to swap context if the thread hasn't actually finished?
-		if(check_thread(running_thread->id) != 1) {
+		if(running_thread->id == 0){
+							gtthread_t *thread_holder;
+							/*gtthread_t *thread_holder, *first_thread;
+							finished_array[0] = 1;
+							printf("Marked main as finished.\n");
+  						fflush(stdout);
+							//free(main_thread_pointer->context); 
+							int count = 1;
+							first_thread = thread_pointers[count];
+							first_thread->context.uc_link = NULL;
+							count++;
+							while(count<id){
+									thread_holder = thread_pointers[count];
+									thread_holder->context.uc_link = &first_thread->context;
+									 count++;
+							}
+							gtthread_yield();*/
+							int count = 1;
+							
+							while(count!=id+1){
+                                	printf("Main joining thread %d running\n", count);
+                                    fflush(stdout);
+									thread_holder = thread_pointers[count];
+									gtthread_join(*thread_holder, NULL);
+                                    printf("Mainesnured thread %d finished\n", count);
+                                    fflush(stdout);
+
+									 count++;
+							}
+
+		}
+		else if(check_thread(running_thread->id) != 1) {
 			finished_array[running_thread->id] = 1;
-            printf("Added %d to finished by calling gttrhead_exit\n", running_thread->id);
+      printf("Added %d to finished by calling gttrhead_exit\n", running_thread->id);
+  		fflush(stdout);
          
 			if (swapcontext(&running_thread->context, &main_thread_pointer->context) == -1){
                 perror("swapcontext");
                 exit(EXIT_FAILURE);
             }  		
-        }
+     }
 		
 		printf("Leaving exit with thread %d running\n", running_thread->id);
   	fflush(stdout);

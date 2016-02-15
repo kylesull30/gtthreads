@@ -17,7 +17,7 @@ void *worker2(void *arg)
 {
     int i;
  
-    for (i = 0; i < 2; i++) {
+    for (i = 0; i < 5; i++) {
         printf("thr2\n");
   			fflush(stdout);
         gtthread_yield();
@@ -29,7 +29,7 @@ void *worker3(void *arg)
 {
     int i;
  
-    for (i = 0; i < 2; i++) {
+    for (i = 0; i < 5; i++) {
         printf("thr3\n");
   			fflush(stdout);
         gtthread_yield();
@@ -44,18 +44,20 @@ int main()
 	  gtthread_init(0);
     gtthread_create(&worker_tid, worker, NULL);
     gtthread_create(&worker2_tid, worker2, NULL);
-    gtthread_create(&worker3_tid, worker3, NULL);
+   // gtthread_create(&worker3_tid, worker3, NULL);
+		gtthread_exit(NULL);
     for (i = 0; i < 2; i++) {
         printf("main\n");
   			fflush(stdout);
         gtthread_yield();
     }
  
-    gtthread_join(worker_tid, NULL);
- 		printf("Join 1 finished.\n");
-  	fflush(stdout);
-    gtthread_join(worker2_tid, NULL);
-    gtthread_join(worker3_tid, NULL);
+    //gtthread_join(worker_tid, NULL);
+ 		//printf("Join 1 finished.\n");
+  	//fflush(stdout);
+
+   // gtthread_join(worker2_tid, NULL);
+    //gtthread_join(worker3_tid, NULL);
     puts("");
  		printf("main finished.\n");
   	fflush(stdout);
