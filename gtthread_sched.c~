@@ -48,13 +48,13 @@ void thread_runner(void) {
   	fflush(stdout);
 
     if(calling_thread->retval != NULL){
-			/*printf("Calling exit NOT null %p for thread %d.\n", calling_thread->retval, calling_thread->id);
-  		fflush(stdout);*/
+			printf("Calling exit NOT null %p for thread %d.\n", calling_thread->retval, calling_thread->id);
+  		fflush(stdout);
     	gtthread_exit(calling_thread->retval);
  		} else {
 
-			/*printf("Calling exit null for thread %d.\n", calling_thread->id);
-  		fflush(stdout);*/
+			printf("Calling exit null for thread %d.\n", calling_thread->id);
+  		fflush(stdout);
     	gtthread_exit(NULL);
 	}
    running_thread = main_thread_pointer;
@@ -201,11 +201,16 @@ gtthread_t *thread_holder;
 			isDone = check_thread(thread.id);
 	}
  
-	if(status != NULL){
+	if(status){
 			thread_holder = thread_pointers[thread.id];
 			*status = thread_holder->retval;
 			
 	}
+    else{
+        printf("NULL status found\n");
+
+        //*status = NULL;
+    }
 
 		printf("Join returning status %d for thread %d\n",thread_holder->retval, thread_holder->id);
   	fflush(stdout);
@@ -218,6 +223,7 @@ gtthread_t *thread_holder;
   The gtthread_exit() function is analogous to pthread_exit.
  */
 void gtthread_exit(void* retval){
+    //int reqret = *((int *)retval);
 		printf("Entering exit with thread %d running\n", running_thread->id);
   	fflush(stdout);
 		//retval = running_thread->retval;
@@ -230,9 +236,14 @@ void gtthread_exit(void* retval){
 		
 		// Do i need to swap context if the thread hasn't actually finished?
 		if(check_thread(running_thread->id) != 1) {
-			
-            gtthread_yield();
-  		}
+			finished_array[running_thread->id] = 1;
+            printf("Added %d to finished by calling gttrhead_exit\n", running_thread->id);
+         
+			if (swapcontext(&running_thread->context, &main_thread_pointer->context) == -1){
+                perror("swapcontext");
+                exit(EXIT_FAILURE);
+            }  		
+        }
 		
 		printf("Leaving exit with thread %d running\n", running_thread->id);
   	fflush(stdout);

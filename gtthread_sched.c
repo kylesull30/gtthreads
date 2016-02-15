@@ -48,13 +48,13 @@ void thread_runner(void) {
   	fflush(stdout);
 
     if(calling_thread->retval != NULL){
-			/*printf("Calling exit NOT null %p for thread %d.\n", calling_thread->retval, calling_thread->id);
-  		fflush(stdout);*/
+			printf("Calling exit NOT null %p for thread %d.\n", calling_thread->retval, calling_thread->id);
+  		fflush(stdout);
     	gtthread_exit(calling_thread->retval);
  		} else {
 
-			/*printf("Calling exit null for thread %d.\n", calling_thread->id);
-  		fflush(stdout);*/
+			printf("Calling exit null for thread %d.\n", calling_thread->id);
+  		fflush(stdout);
     	gtthread_exit(NULL);
 	}
    running_thread = main_thread_pointer;
@@ -195,20 +195,29 @@ gtthread_t *thread_holder;
 	int isDone = 0;
 
 		isDone = check_thread(thread.id);
-		
+	  printf("Waiting to finish\n");
+  fflush(stdout);	
 		while(isDone != 1){
 			gtthread_yield();
 			isDone = check_thread(thread.id);
 	}
- 
-	if(status != NULL){
+ 	  printf("Finished.\n");
+  fflush(stdout);	
+	if(status){
+         	  printf("Status isn't NULL.\n");
+  fflush(stdout);
 			thread_holder = thread_pointers[thread.id];
 			*status = thread_holder->retval;
 			
 	}
+    else{
+        printf("NULL status found\n");
+        fflush(stdout);
 
-		printf("Join returning status %d for thread %d\n",thread_holder->retval, thread_holder->id);
-  	fflush(stdout);
+        //status = NULL;
+    }
+
+
   printf("Leaving join with thread %d running\n", running_thread->id);
   fflush(stdout);
 	return 0;
