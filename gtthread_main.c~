@@ -10,7 +10,7 @@ void *worker(void *arg)
   			fflush(stdout);
         gtthread_yield();
     }
-    return NULL;
+    return 23;
 }
 
 void *worker2(void *arg)
