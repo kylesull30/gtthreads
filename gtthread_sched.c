@@ -19,13 +19,12 @@ gtthreads library.  A simple round-robin queue should be used.
 
 static int id = 0;
 static int p;
-static steque_t queue;
-static steque_t finished_queue;
+static steque_t queue; // data strcuture enforces round-robbin scheduling
 static gtthread_t *running_thread;
-static gtthread_t *main_thread_pointer;
+static gtthread_t *main_thread_pointer;//pointer to the main thread
 static gtthread_t *next_thread;
-static int finished_array [10] = {0,0,0,0,0,0,0,0,0,0};
-static gtthread_t* thread_pointers [10] = {0,0,0,0,0,0,0,0,0,0};
+static int finished_array [10] = {0,0,0,0,0,0,0,0,0,0};// thread pointer is only here if it has finished executing
+static gtthread_t* thread_pointers [10] = {0,0,0,0,0,0,0,0,0,0};//access thread pointers without interacting with scheduler
 
 
 // Thread runner
@@ -75,7 +74,7 @@ void gtthread_init(long period){
 	main_thread_pointer->id = 0;
 	main_thread_pointer->state = 0;
 	steque_init(&queue);
-	steque_init(&finished_queue);
+
 	main_thread_pointer->context.uc_link = NULL;
 	
 	thread_pointers [0] = main_thread_pointer;
