@@ -24,52 +24,27 @@ static steque_t finished_queue;
 static gtthread_t *running_thread;
 static gtthread_t *main_thread_pointer;
 static gtthread_t *next_thread;
-static int finished_array [ 10] = {0,0,0,0,0,0,0,0,0,0};
-static gtthread_t* thread_pointers [ 10] = {0,0,0,0,0,0,0,0,0,0};
-//static void *arg;
-//static gtthread_t main_thread;
+static int finished_array [10] = {0,0,0,0,0,0,0,0,0,0};
+static gtthread_t* thread_pointers [10] = {0,0,0,0,0,0,0,0,0,0};
 
-//static ucontext_t uctx_thisRoutine;
 
 // Thread runner
 
 void thread_runner(void) {
 
-		printf("Entering runner with thread %d running\n", running_thread->id);
-  	fflush(stdout);
 		gtthread_t *calling_thread = next_thread;
 		calling_thread->retval = calling_thread->func(calling_thread->arg);
-		/*printf("Thread %d finished.\n", running_thread->id);
-  	fflush(stdout);*/
 
 		// mark as finished
 		finished_array[calling_thread->id] = 1;
-		printf("Added %d to finished\n", calling_thread->id);
-  	fflush(stdout);
 
     if(calling_thread->retval != NULL){
-			printf("Calling exit NOT null %p for thread %d.\n", calling_thread->retval, calling_thread->id);
-  		fflush(stdout);
     	gtthread_exit(calling_thread->retval);
  		} else {
-
-			printf("Calling exit null for thread %d.\n", calling_thread->id);
-  		fflush(stdout);
     	gtthread_exit(NULL);
 	}
 
-
-	/*if(check_thread(0) == 0){
-				running_thread = main_thread_pointer;
-	}
-	else{
-
-			running_thread = thread_pointers[1];
-	}*/
-
 	running_thread = main_thread_pointer;
- printf("Leaving runner with thread %d running\n", running_thread->id);
-  fflush(stdout);
 
 }
 
@@ -103,31 +78,10 @@ void gtthread_init(long period){
 	steque_init(&finished_queue);
 	main_thread_pointer->context.uc_link = NULL;
 	
-	/*if (getcontext(&main_thread_pointer->context)  == -1){
-  		perror("getcontext");
-    		exit(EXIT_FAILURE);
-	}
- 
-	
-	// allocate stacks
-	main_thread_pointer->context.uc_stack.ss_sp = (char*) malloc(SIGSTKSZ);
-	main_thread_pointer->context.uc_stack.ss_size = SIGSTKSZ;
-	
-
-	// Set successor
-	main_thread_pointer->context.uc_link = NULL;
-
-
-	makecontext(&main_thread_pointer->context, &thread_runner, 1, 0, NULL);*/
-
-
 	thread_pointers [0] = main_thread_pointer;
 
 	running_thread = main_thread_pointer;
 
-
- 	printf("Eqnueueing %d (%p) running.\n", running_thread->id, running_thread);
-  fflush(stdout);	
  	steque_enqueue(&queue, main_thread_pointer);
 }
 
@@ -138,8 +92,7 @@ void gtthread_init(long period){
  */
 int gtthread_create(gtthread_t *thread, void *(*start_routine)(void *),
 		    void *arg){
- 	printf("Entering create with thread %d running.\n", running_thread->id);
-  fflush(stdout);
+
   gtthread_t *calling_thread;
 	next_thread = (gtthread_t*) malloc(sizeof(gtthread_t));
 	next_thread = thread;
@@ -174,8 +127,7 @@ int gtthread_create(gtthread_t *thread, void *(*start_routine)(void *),
 	calling_thread = running_thread;
  	
 	running_thread = next_thread;
-	/*printf("Enqueueing %d (%p) running.\n", next_thread->id, next_thread);
-  fflush(stdout);	*/
+
 	thread_pointers[next_thread->id] =  next_thread;
 	steque_enqueue(&queue, next_thread);
 	if (swapcontext(&calling_thread->context, &next_thread->context) == -1){
@@ -187,10 +139,6 @@ int gtthread_create(gtthread_t *thread, void *(*start_routine)(void *),
 
 	running_thread = calling_thread;
 
-	printf("Leaving create with thread %d running\n", running_thread->id);
-  	fflush(stdout);
-    //running_thread = main_thread_pointer;
-
 	return 0;
 }
 
@@ -199,38 +147,25 @@ int gtthread_create(gtthread_t *thread, void *(*start_routine)(void *),
   All gtthreads are joinable.
  */
 int gtthread_join(gtthread_t thread, void **status){
-  printf("Entering join with thread %d running and waiting on thread %d\n", running_thread->id, thread.id);
-  fflush(stdout);
-gtthread_t *thread_holder;
-	//gtthread_t *calling_thread, *translate_thread;
+
+	gtthread_t *thread_holder;
+
 	int isDone = 0;
 
-		isDone = check_thread(thread.id);
-	  printf("Waiting to finish\n");
-  fflush(stdout);	
-		while(isDone != 1){
+	isDone = check_thread(thread.id);
+
+	while(isDone != 1){
 			gtthread_yield();
 			isDone = check_thread(thread.id);
 	}
- 	  printf("Finished.\n");
-  fflush(stdout);	
+
 	if(status){
-         	  printf("Status isn't NULL.\n");
-  fflush(stdout);
+
 			thread_holder = thread_pointers[thread.id];
 			*status = thread_holder->retval;
 			
 	}
-    else{
-        printf("NULL status found\n");
-        fflush(stdout);
 
-        //status = NULL;
-    }
-
-
-  printf("Leaving join with thread %d running\n", running_thread->id);
-  fflush(stdout);
 	return 0;
 }
 
@@ -238,63 +173,32 @@ gtthread_t *thread_holder;
   The gtthread_exit() function is analogous to pthread_exit.
  */
 void gtthread_exit(void* retval){
-    //int reqret = *((int *)retval);
-		printf("Entering exit with thread %d running\n", running_thread->id);
-  	fflush(stdout);
-		//retval = running_thread->retval;
-     running_thread->retval = retval;
 
+    running_thread->retval = retval;
 		running_thread->state = 1;
-		//gtthread_t *thread_holder = steque_pop(&queue);
-		//steque_enqueue(&finished_queue, &running_thread->id);
-		// remove from queue
-		
-		// Do i need to swap context if the thread hasn't actually finished?
-		if(running_thread->id == 0){
-							gtthread_t *thread_holder;
-							/*gtthread_t *thread_holder, *first_thread;
-							finished_array[0] = 1;
-							printf("Marked main as finished.\n");
-  						fflush(stdout);
-							//free(main_thread_pointer->context); 
-							int count = 1;
-							first_thread = thread_pointers[count];
-							first_thread->context.uc_link = NULL;
-							count++;
-							while(count<id){
-									thread_holder = thread_pointers[count];
-									thread_holder->context.uc_link = &first_thread->context;
-									 count++;
-							}
-							gtthread_yield();*/
-							int count = 1;
-							
-							while(count!=id+1){
-                                	printf("Main joining thread %d running\n", count);
-                                    fflush(stdout);
-									thread_holder = thread_pointers[count];
-									gtthread_join(*thread_holder, NULL);
-                                    printf("Mainesnured thread %d finished\n", count);
-                                    fflush(stdout);
 
-									 count++;
-							}
+
+		if(running_thread->id == 0){
+				gtthread_t *thread_holder;
+				int count = 1;
+							
+				while(count!=id+1){
+
+						thread_holder = thread_pointers[count];
+						gtthread_join(*thread_holder, NULL);
+						count++;
+				}
 
 		}
 		else if(check_thread(running_thread->id) != 1) {
 			finished_array[running_thread->id] = 1;
-      printf("Added %d to finished by calling gttrhead_exit\n", running_thread->id);
-  		fflush(stdout);
          
 			if (swapcontext(&running_thread->context, &main_thread_pointer->context) == -1){
                 perror("swapcontext");
                 exit(EXIT_FAILURE);
             }  		
      }
-		
-		printf("Leaving exit with thread %d running\n", running_thread->id);
-  	fflush(stdout);
-		
+				
 }
 
 
@@ -306,37 +210,29 @@ void gtthread_exit(void* retval){
 void gtthread_yield(void){
 	// remove next thread from stack and set current thread to end of queue
 	// set context to main, then implement as set to next in queue
-	//gtthread_t current_thread;
 
-  	printf("Entering yield with thread %d running\n", running_thread->id);
-  	fflush(stdout);
-		gtthread_t *calling_thread;
 
-	 if(steque_size(&queue)>0){
+	gtthread_t *calling_thread;
+
+	if(steque_size(&queue)>0){
 		
 		next_thread = steque_front(&queue);
- 		/*printf("Read %d (%p) from queue.\n", next_thread->id, next_thread);
-  	fflush(stdout);	*/
+
 		steque_cycle(&queue);
- 		/*printf("Cycled %d (%p) to back.\n", next_thread->id, next_thread);
-  	fflush(stdout);*/
+
 		running_thread->state = 0;
     calling_thread = running_thread;
 		running_thread = next_thread;
- 		/*printf("Attempting to swap %d (%p).\n", next_thread->id, next_thread);
-  	fflush(stdout);*/
-		if(next_thread->state != 1){
+
+	if(next_thread->state != 1){
 			if (swapcontext(&calling_thread->context, &next_thread->context) == -1){
    	 		perror("swapcontext");
     		exit(EXIT_FAILURE);
   		}
 		}
 
-
 		running_thread = calling_thread;
 
-	printf("Leaving yield with thread %d running\n", running_thread->id);
-  	fflush(stdout);
 
 	}
 	
@@ -348,8 +244,7 @@ void gtthread_yield(void){
   returning non-zero if the threads are the same and zero otherwise.
  */
 int  gtthread_equal(gtthread_t t1, gtthread_t t2){
-		printf("Checking to see if %d is equal to %d \n", t1.id, t2.id);
-  	fflush(stdout);
+
 	if(t1.id == t2.id){
 		return 1;
 	}
@@ -364,10 +259,11 @@ int  gtthread_equal(gtthread_t t1, gtthread_t t2){
   allowing one thread to terminate another asynchronously.
  */
 int  gtthread_cancel(gtthread_t thread){
-	//thread.state = 1;
-	// do cancel stuff
-exit(0);
-	return 0;
+
+  	gtthread_t *thread_holder = thread_pointers[thread.id];
+		finished_array[thread_holder->id] = 1;
+
+    return 0;
 }
 
 
@@ -375,7 +271,5 @@ exit(0);
   Returns calling thread.
  */
 gtthread_t gtthread_self(void){
-		printf("Main thread is ID %d\n", running_thread->id);
-  	fflush(stdout);
 	return *(running_thread);
 }
