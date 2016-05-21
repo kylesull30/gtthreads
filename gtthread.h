@@ -11,14 +11,9 @@ typedef struct gtthread_t{
 	void **retval;
 	void *(*func)(void *);
 	void *arg;
-  /*enum States{
-  	RUNNING,
-  	WAITING,
-  	FINISHED
-	} state;*/
 	int state;
   int id;
-  //int return_code;
+
 } gtthread_t;
 typedef void* gtthread_mutex_t;
 
